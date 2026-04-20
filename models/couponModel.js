@@ -1,22 +1,60 @@
-const mongoose = require('mongoose'); // Erase if already required
+const mongoose = require('mongoose');
 
-// Declare the Schema of the Mongo model
 var couponSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true,
-        uppercase:true,
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        uppercase: true,
+        trim: true,
     },
-    expiry:{
-        type:Date,
-        required:true,
+    discountType: {
+        type: String,
+        required: true,
+        enum: ['percentage', 'flat'],
+        default: 'percentage',
     },
-    discount:{
-        type:Number,
-        required:true,
+    discount: {
+        type: Number,
+        required: true,
+        min: 0,
     },
+    maxDiscount: {
+        type: Number,
+        default: null,
+        min: 0,
+    },
+    minOrderAmount: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    expiry: {
+        type: Date,
+        required: true,
+    },
+    usageLimit: {
+        type: Number,
+        default: null,
+        min: 1,
+    },
+    usedCount: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    perUserLimit: {
+        type: Number,
+        default: 1,
+        min: 1,
+    },
+    usedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+}, {
+    timestamps: true,
 });
 
-//Export the model
 module.exports = mongoose.model('Coupon', couponSchema);

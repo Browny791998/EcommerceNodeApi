@@ -1,55 +1,40 @@
-const Enquiry = require('../models/enqModel')
-const asyncHandler = require("express-async-handler");
-const validateMongoDbId = require("../utils/validateMongodbId")
+const Enquiry = require('../models/enqModel');
+const asyncHandler = require('express-async-handler');
+const validateMongoDbId = require('../utils/validateMongodbId');
 
-const createEnquiry = asyncHandler(async(req,res) => {
-    try {
-      const newEnquiry = await Enquiry.create(req.body);
-      res.json(newEnquiry);  
-    } catch (error) {
-        throw new Error(error);
-    }
-})
+// Public — any visitor can submit an enquiry
+const createEnquiry = asyncHandler(async (req, res) => {
+    const newEnquiry = await Enquiry.create(req.body);
+    res.json(newEnquiry);
+});
 
-const updateEnquiry = asyncHandler(async(req,res) => {
-  const id = req.params.id;
-  try {
-    const updatedEnquiry = await Enquiry.findByIdAndUpdate({ _id: id }, req.body, {
-      new: true,
-    });
-    res.json(updatedEnquiry);  
-  } catch (error) {
-      throw new Error(error);
-  }
-})
+const updateEnquiry = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
+    const updated = await Enquiry.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    if (!updated) throw new Error('Enquiry not found');
+    res.json(updated);
+});
 
-const deleteEnquiry = asyncHandler(async(req,res) => {
-  const {id} = req.params;
-  try {
-    const deletedEnquiry = await Enquiry.findByIdAndDelete(id);
-    res.json(deletedEnquiry);  
-  } catch (error) {
-      throw new Error(error);
-  }
-})
+const deleteEnquiry = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
+    const deleted = await Enquiry.findByIdAndDelete(id);
+    if (!deleted) throw new Error('Enquiry not found');
+    res.json(deleted);
+});
 
-const getEnquiry = asyncHandler(async(req,res) => {
-  const {id} = req.params;
-  try {
-    const getEnquiry = await Enquiry.findById(id);
-    res.json(getEnquiry);  
-  } catch (error) {
-      throw new Error(error);
-  }
-})
+const getEnquiry = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
+    const enquiry = await Enquiry.findById(id);
+    if (!enquiry) throw new Error('Enquiry not found');
+    res.json(enquiry);
+});
 
-const getallEnquiry = asyncHandler(async(req,res) => {
-  const {id} = req.params;
-  try {
-    const getallEnquiry = await Enquiry.find();
-    res.json(getallEnquiry);  
-  } catch (error) {
-      throw new Error(error);
-  }
-})
-module.exports = {createEnquiry,updateEnquiry,deleteEnquiry,getEnquiry,getallEnquiry};
+const getallEnquiry = asyncHandler(async (req, res) => {
+    const enquiries = await Enquiry.find().sort('-createdAt');
+    res.json(enquiries);
+});
+
+module.exports = { createEnquiry, updateEnquiry, deleteEnquiry, getEnquiry, getallEnquiry };

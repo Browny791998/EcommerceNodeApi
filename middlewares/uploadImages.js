@@ -37,22 +37,29 @@ const uploadPhoto = multer({
 
 const productImgResize = async (req, res, next) => {
     if (!req.files) return next();
+    const dir = path.join(__dirname, '../public/images/products');
+    fs.mkdirSync(dir, { recursive: true });
     await Promise.all(
         req.files.map(async (file) => {
-            await sharp(file.path).resize(300, 300).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/images/products/${file.filename}`);
-            fs.unlinkSync(`public/images/products/${file.filename}`);
+            const dest = path.join(dir, file.filename);
+            await sharp(file.path).resize(300, 300).toFormat('jpeg').jpeg({ quality: 90 }).toFile(dest);
+            fs.unlinkSync(file.path);
+            file.path = dest;
         })
     );
-   
     next();
 }
 
 const blogImgResize = async (req, res, next) => {
     if (!req.files) return next();
+    const dir = path.join(__dirname, '../public/images/blogs');
+    fs.mkdirSync(dir, { recursive: true });
     await Promise.all(
         req.files.map(async (file) => {
-            await sharp(file.path).resize(300, 300).toFormat('jpeg').jpeg({ quality: 90 }).toFile(`public/images/blogs/${file.filename}`);
-            fs.unlinkSync(`public/images/blogs/${file.filename}`);
+            const dest = path.join(dir, file.filename);
+            await sharp(file.path).resize(300, 300).toFormat('jpeg').jpeg({ quality: 90 }).toFile(dest);
+            fs.unlinkSync(file.path);
+            file.path = dest;
         })
     );
     next();

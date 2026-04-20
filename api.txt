@@ -1,0 +1,255 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Now I have complete API information. Here's the comprehensive testing guide:
+
+---
+
+# E-Commerce API Testing Guide
+
+**Base URL:** `http://localhost:4000` (or your configured PORT)
+
+---
+
+## 1. USER APIs (`/api/user`)
+
+### Authentication (Public)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 1 | POST | `/api/user/register` | `{"firstname":"John","lastname":"Doe","email":"john@example.com","mobile":"+1234567890","password":"password123"}` | Register new user |
+| 2 | POST | `/api/user/login` | `{"email":"john@example.com","password":"password123"}` | User login |
+| 3 | POST | `/api/user/admin-login` | `{"email":"admin@example.com","password":"admin123"}` | Admin login |
+| 4 | GET | `/api/user/refresh` | - | Get new access token using refresh token cookie |
+| 5 | POST | `/api/user/logout` | - | Logout user |
+
+### Password Management
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 6 | POST | `/api/user/forgot-password-token` | `{"email":"john@example.com"}` | Send password reset email |
+| 7 | PUT | `/api/user/reset-password/:token` | `{"password":"newpassword123"}` | Reset password with token |
+
+### Profile (Auth Required)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 8 | PUT | `/api/user/edit-user` | `{"firstname":"Jane","lastname":"Doe","email":"jane@example.com","mobile":"+0987654321"}` | Update own profile |
+| 9 | PUT | `/api/user/password` | `{"password":"newpassword123"}` | Change password |
+| 10 | GET | `/api/user/wishlist` | - | Get user's wishlist |
+
+### Address Management (Auth Required)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 11 | POST | `/api/user/address` | `{"fullName":"John Doe","phone":"+1234567890","street":"123 Main St","city":"New York","state":"NY","postalCode":"10001","country":"USA","isDefault":true}` | Add address |
+| 12 | PUT | `/api/user/address/:addressId` | `{"fullName":"Jane Doe","phone":"+0987654321","street":"456 Oak Ave"}` | Update address |
+| 13 | DELETE | `/api/user/address/:addressId` | - | Delete address |
+
+### Cart (Auth Required)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 14 | POST | `/api/user/cart` | `{"cart":[{"_id":"product_id_1","count":2,"color":"color_id"},{"_id":"product_id_2","count":1,"color":"color_id"}]}` | Add to cart |
+| 15 | GET | `/api/user/cart` | - | Get user cart |
+| 16 | DELETE | `/api/user/empty-cart` | - | Empty cart |
+| 17 | POST | `/api/user/cart/applycoupon` | `{"coupon":"SUMMER2024"}` | Apply coupon |
+
+### Orders (Auth Required)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 18 | POST | `/api/user/cart/cash-order` | `{"COD":true,"couponApplied":true,"shippingAddress":{"fullName":"John","phone":"123","street":"Main St","city":"NYC","state":"NY","postalCode":"10001","country":"USA"}}` | Create COD order |
+| 19 | GET | `/api/user/get-orders` | - | Get user orders |
+| 20 | GET | `/api/user/all-orders` | - | Admin: Get all orders |
+| 21 | PUT | `/api/user/order/update-order/:id` | `{"status":"Delivered","trackingNumber":"TRK123456"}` | Admin: Update order status |
+
+### Admin User Management (Admin Only)
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 22 | GET | `/api/user/all-users` | - | Get all users |
+| 23 | PUT | `/api/user/block-user/:id` | - | Block user |
+| 24 | PUT | `/api/user/unblock-user/:id` | - | Unblock user |
+| 25 | DELETE | `/api/user/:id` | - | Delete user |
+| 26 | GET | `/api/user/:id` | - | Get single user |
+
+---
+
+## 2. PRODUCT APIs (`/api/product`)
+
+| # | Method | URL | Payload/Params | Auth | Description |
+|---|--------|-----|----------------|------|-------------|
+| 27 | GET | `/api/product/` | Query: `?page=1&limit=10&sort=-price` | No | Get all products |
+| 28 | POST | `/api/product/` | `{"title":"iPhone 15","description":"Latest iPhone","price":999,"category":"cat_id","brand":"brand_id","quantity":50,"color":["color_id1","color_id2"],"tags":["phone","apple"]}` | Admin | Create product |
+| 29 | GET | `/api/product/:id` | - | No | Get single product |
+| 30 | PUT | `/api/product/:id` | `{"title":"iPhone 15 Pro","price":1099}` | Admin | Update product |
+| 31 | DELETE | `/api/product/:id` | - | Admin | Delete product |
+| 32 | PUT | `/api/product/wishlist` | `{"productId":"product_id"}` | User | Toggle wishlist |
+| 33 | PUT | `/api/product/rating` | `{"star":5,"productId":"product_id","comment":"Great product!"}` | User | Rate product |
+| 34 | PUT | `/api/product/upload/:id` | Form-data: `images` (files) | Admin | Upload product images |
+| 35 | DELETE | `/api/product/delete-img/:id` | `id` = cloudinary public_id | Admin | Delete image |
+
+---
+
+## 3. BLOG APIs (`/api/blog`)
+
+| # | Method | URL | Payload | Auth | Description |
+|---|--------|-----|---------|------|-------------|
+| 36 | GET | `/api/blog/` | - | No | Get all blogs |
+| 37 | POST | `/api/blog/` | `{"title":"New Blog","description":"Blog content...","category":"blogcat_id","images":[{"public_id":"img1","url":"http://..."}]}` | Admin | Create blog |
+| 38 | GET | `/api/blog/:id` | - | No | Get single blog |
+| 39 | PUT | `/api/blog/:id` | `{"title":"Updated Title"}` | Admin | Update blog |
+| 40 | DELETE | `/api/blog/:id` | - | Admin | Delete blog |
+| 41 | PUT | `/api/blog/likes` | `{"blogId":"blog_id"}` | User | Like/unlike blog |
+| 42 | PUT | `/api/blog/dislikes` | `{"blogId":"blog_id"}` | User | Dislike/undislike blog |
+| 43 | PUT | `/api/blog/upload/:id` | Form-data: `images` (files, max 2) | Admin | Upload blog images |
+
+---
+
+## 4. PRODUCT CATEGORY APIs (`/api/category`) - Admin Only
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 44 | GET | `/api/category/` | - | Get all categories |
+| 45 | POST | `/api/category/` | `{"title":"Electronics"}` | Create category |
+| 46 | GET | `/api/category/:id` | - | Get single category |
+| 47 | PUT | `/api/category/:id` | `{"title":"Consumer Electronics"}` | Update category |
+| 48 | DELETE | `/api/category/:id` | - | Delete category |
+
+---
+
+## 5. BLOG CATEGORY APIs (`/api/blogcategory`) - Admin Only
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 49 | GET | `/api/blogcategory/` | - | Get all blog categories |
+| 50 | POST | `/api/blogcategory/` | `{"title":"Tech News"}` | Create blog category |
+| 51 | GET | `/api/blogcategory/:id` | - | Get single blog category |
+| 52 | PUT | `/api/blogcategory/:id` | `{"title":"Technology"}` | Update blog category |
+| 53 | DELETE | `/api/blogcategory/:id` | - | Delete blog category |
+
+---
+
+## 6. BRAND APIs (`/api/brand`) - Admin Only
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 54 | GET | `/api/brand/` | - | Get all brands |
+| 55 | POST | `/api/brand/` | `{"title":"Apple"}` | Create brand |
+| 56 | GET | `/api/brand/:id` | - | Get single brand |
+| 57 | PUT | `/api/brand/:id` | `{"title":"Apple Inc."}` | Update brand |
+| 58 | DELETE | `/api/brand/:id` | - | Delete brand |
+
+---
+
+## 7. COLOR APIs (`/api/color`) - Admin Only
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 59 | GET | `/api/color/` | - | Get all colors |
+| 60 | POST | `/api/color/` | `{"title":"Midnight Black"}` | Create color |
+| 61 | GET | `/api/color/:id` | - | Get single color |
+| 62 | PUT | `/api/color/:id` | `{"title":"Space Gray"}` | Update color |
+| 63 | DELETE | `/api/color/:id` | - | Delete color |
+
+---
+
+## 8. COUPON APIs (`/api/coupon`) - Admin Only
+
+| # | Method | URL | Payload | Description |
+|---|--------|-----|---------|-------------|
+| 64 | GET | `/api/coupon/` | - | Get all coupons |
+| 65 | POST | `/api/coupon/` | `{"name":"SUMMER2024","discountType":"percentage","discount":20,"maxDiscount":50000,"minOrderAmount":100000,"expiry":"2024-12-31","usageLimit":100,"perUserLimit":1}` | Create coupon |
+| 66 | GET | `/api/coupon/:id` | - | Get single coupon |
+| 67 | PUT | `/api/coupon/:id` | `{"discount":25,"isActive":true}` | Update coupon |
+| 68 | DELETE | `/api/coupon/:id` | - | Delete coupon |
+
+---
+
+## 9. ENQUIRY APIs (`/api/enquiry`)
+
+| # | Method | URL | Payload | Auth | Description |
+|---|--------|-----|---------|------|-------------|
+| 69 | POST | `/api/enquiry/` | `{"name":"John","email":"john@example.com","mobile":"123456","comment":"How long is shipping?"}` | No | Create enquiry (Public) |
+| 70 | GET | `/api/enquiry/` | - | Admin | Get all enquiries |
+| 71 | GET | `/api/enquiry/:id` | - | Admin | Get single enquiry |
+| 72 | PUT | `/api/enquiry/:id` | `{"status":"Contacted"}` | Admin | Update enquiry |
+| 73 | DELETE | `/api/enquiry/:id` | - | Admin | Delete enquiry |
+
+---
+
+## Recommended Testing Order
+
+```
+1. Setup (Create lookup data first):
+   POST /api/user/register (create admin with role: "admin" in DB)
+   POST /api/category/ (create categories)
+   POST /api/brand/ (create brands)
+   POST /api/color/ (create colors)
+   POST /api/blogcategory/ (create blog categories)
+
+2. Authentication:
+   POST /api/user/admin-login → save token
+
+3. Products:
+   POST /api/product/ (create products)
+   GET /api/product/
+
+4. User Features (as normal user):
+   POST /api/user/register (normal user)
+   POST /api/user/login → save token
+   PUT /api/product/wishlist
+   PUT /api/product/rating
+   POST /api/user/cart
+   POST /api/user/cart/applycoupon
+   POST /api/user/cart/cash-order
+
+5. Blog (Admin):
+   POST /api/blog/
+
+6. Blog (User):
+   PUT /api/blog/likes
+
+7. Enquiry (Public):
+   POST /api/enquiry/
+```
+
+---
+
+## Headers for Authenticated Requests
+
+```json
+{
+  "Authorization": "Bearer <your_jwt_token>",
+  "Content-Type": "application/json"
+}
+```
+
+## File Upload Headers
+
+```json
+{
+  "Authorization": "Bearer <token>",
+  "Content-Type": "multipart/form-data"
+}
+```
+
+---
+
+**Total APIs: 73 endpoints**
